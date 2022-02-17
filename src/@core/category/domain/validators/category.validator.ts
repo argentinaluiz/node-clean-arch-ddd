@@ -1,5 +1,5 @@
 import { CategoryProperties } from "../entities/category";
-import ClassValidator from "../@seedwork/validators/class.validator";
+import ClassValidator from "../../../@seedwork/domain/validators/class.validator";
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export default class CategoryValidatorFactory {

@@ -1,7 +1,7 @@
-import Entity from "../../../domain/@seedwork/entity/entity";
-import UniqueEntityId from "../../../domain/@seedwork/entity/unique-entity-id";
-import NotFoundError from "../../../domain/@seedwork/errors/not-found.error";
-import RepositoryInterface from "../../../domain/@seedwork/repository-interface";
+import Entity from "../../../../@seedwork/domain/entity/entity";
+import UniqueEntityId from "../../../../@seedwork/domain/entity/unique-entity-id";
+import NotFoundError from "../../../../@seedwork/domain/errors/not-found.error";
+import RepositoryInterface from "../../../../@seedwork/domain/repository-interface";
 
 type Model<ModelProps> = { id: string } & ModelProps;
 

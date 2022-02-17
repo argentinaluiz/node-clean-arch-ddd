@@ -1,4 +1,4 @@
-import RepositoryInterface from "../@seedwork/repository-interface";
+import RepositoryInterface from "../../../@seedwork/domain/repository-interface";
 import Category from "../entities/category";
 
 export default interface CategoryRepository

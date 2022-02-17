@@ -1,7 +1,7 @@
-import AggregateRoot from "../@seedwork/entity/aggregate-root";
-import UniqueEntityId from "../@seedwork/entity/unique-entity-id";
+import AggregateRoot from "../../../@seedwork/domain/entity/aggregate-root";
+import UniqueEntityId from "../../../@seedwork/domain/entity/unique-entity-id";
 import CategoryValidatorFactory from "../validators/category.validator";
-import ValidatorRules from "../@seedwork/validators/validator-rules";
+import ValidatorRules from "../../../@seedwork/domain/validators/validator-rules";
 
 export type CategoryProperties = {
   name: string;

@@ -1,4 +1,4 @@
-import UniqueEntityId from "@core/domain/@seedwork/entity/unique-entity-id";
+import UniqueEntityId from "../../../../@seedwork/domain/entity/unique-entity-id";
 import Category, {
   CategoryProperties,
 } from "../../../domain/entities/category";
