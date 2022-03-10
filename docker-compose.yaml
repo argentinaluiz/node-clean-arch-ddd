@@ -4,7 +4,7 @@ services:
   app:
     build: .
     command: .docker/entrypoint.sh
-    container_name: micro-videos-app-without-nest-typescript
+    container_name: micro-videos-typescript-test-app
     tty: true
     ports:
       - 3000:3000

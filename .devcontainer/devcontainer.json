@@ -2,12 +2,13 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.217.4/containers/docker-existing-docker-compose
 // If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
 {
-	"name": "micro-videos-typescript",
+	"name": "micro-videos-typescript-test",
 
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
 	"dockerComposeFile": [
 		"../docker-compose.yaml",
+		"../docker-compose.override.yaml",
 		"docker-compose.yml"
 	],
 
@@ -21,8 +22,7 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"terminal.integrated.defaultProfile.linux": "bash",
-		"terminal.integrated.shell.linux": "/bin/bash",
+		"terminal.integrated.defaultProfile.linux": "zsh",
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
