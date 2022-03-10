@@ -26,7 +26,7 @@ describe("ClassValidator Unit Tests", () => {
     expect(validateSyncSpy).toHaveBeenCalled();
   });
 
-  it("should validate with throw EntityValidatorError", () => {
+  it("should validate with throw ValidatorError", () => {
     const validateSyncSpy = jest
       .spyOn(libValidator, "validateSync")
       .mockReturnValue([

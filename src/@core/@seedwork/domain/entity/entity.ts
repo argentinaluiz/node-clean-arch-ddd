@@ -1,4 +1,4 @@
-import UniqueEntityId from "./unique-entity-id";
+import UniqueEntityId from "../value-objects/unique-entity-id";
 
 export default abstract class Entity<Props = any> {
   protected readonly _id: UniqueEntityId;
@@ -11,10 +11,10 @@ export default abstract class Entity<Props = any> {
     return this._id.value;
   }
 
-  toJSON() {
+  toJSON(): Required<{ id: string } & Props> {
     return {
       id: this._id.value,
       ...this.props,
-    };
+    } as Required<{id: string} & Props>;
   }
 }

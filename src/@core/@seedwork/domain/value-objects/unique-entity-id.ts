@@ -1,6 +1,6 @@
 import ValueObject from './value-object';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import InvalidArgumentError from '../errors/invalid-argument.error';
+import InvalidUuidError from '../errors/invalid-uuid.error';
 
 export default class UniqueEntityId extends ValueObject<string> {
   constructor(id?: string) {
@@ -11,7 +11,7 @@ export default class UniqueEntityId extends ValueObject<string> {
   private validate() {
     const isValid = uuidValidate(this._value);
     if (!isValid) {
-      throw new InvalidArgumentError('ID must be a valid UUID');
+      throw new InvalidUuidError()
     }
   }
 }

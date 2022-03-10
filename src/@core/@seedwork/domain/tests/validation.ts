@@ -1,4 +1,5 @@
 import { objectContaining } from "expect";
+import ValidationError from "../errors/validation.error";
 import ClassValidator from "../validators/class.validator";
 
 // declare global {
@@ -28,7 +29,8 @@ expect.extend({
         message: () => `The data is valid`,
       };
     } catch (e) {
-      const isMatch = objectContaining(received).asymmetricMatch(e.error);
+      const error = e as ValidationError;
+      const isMatch = objectContaining(received).asymmetricMatch(error.error);
       return isMatch
         ? {
             pass: true,
@@ -39,7 +41,7 @@ expect.extend({
             message: () =>
               `The validation errors not contains ${JSON.stringify(
                 received
-              )}. Current: ${JSON.stringify(e.error)}`,
+              )}. Current: ${JSON.stringify(error.error)}`,
           };
     }
   },

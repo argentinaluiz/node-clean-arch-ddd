@@ -1,3 +1,4 @@
+import UniqueEntityId from "../../../../@seedwork/domain/value-objects/unique-entity-id";
 import CategoryValidatorFactory, {
   CategoryValidator,
 } from "./../category.validator";
@@ -8,6 +9,27 @@ describe("Category validators tests", () => {
     beforeEach(() => {
       validator = CategoryValidatorFactory.create();
     });
+
+    test("invalidation cases for id field", () => {
+      expect({ validator, data: null }).containErrorMessages({
+        id: [
+          "id should not be empty",
+          "id must be an instance of UniqueEntityId",
+        ],
+      });
+
+      expect({ validator, data: { id: "" } }).containErrorMessages({
+        id: [
+          "id should not be empty",
+          "id must be an instance of UniqueEntityId",
+        ],
+      });
+
+      expect({ validator, data: { id: 5 } }).containErrorMessages({
+        id: ["id must be an instance of UniqueEntityId"],
+      });
+    });
+
     test("invalidation cases for name field", () => {
       expect({ validator, data: null }).containErrorMessages({
         name: [
@@ -58,11 +80,27 @@ describe("Category validators tests", () => {
 
     test("validate cases for fields", () => {
       expect.assertions(0);
-      validator.validate({ name: "test" });
-      validator.validate({ name: "test", description: undefined });
-      validator.validate({ name: "test", description: null });
-      validator.validate({ name: "test", is_active: true });
-      validator.validate({ name: "test", is_active: false });
+      validator.validate({ id: new UniqueEntityId(), name: "test" });
+      validator.validate({
+        id: new UniqueEntityId(),
+        name: "test",
+        description: undefined,
+      });
+      validator.validate({
+        id: new UniqueEntityId(),
+        name: "test",
+        description: null,
+      });
+      validator.validate({
+        id: new UniqueEntityId(),
+        name: "test",
+        is_active: true,
+      });
+      validator.validate({
+        id: new UniqueEntityId(),
+        name: "test",
+        is_active: false,
+      });
     });
   });
 });

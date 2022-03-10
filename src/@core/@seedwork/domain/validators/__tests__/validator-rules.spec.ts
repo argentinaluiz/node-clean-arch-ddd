@@ -1,10 +1,14 @@
 import { SimpleValidationError } from "../../errors/validation.error";
 import ValidationRules from "../validator-rules";
 
+type PickMatching<T, V> = {
+  [K in keyof T as T[K] extends V ? K : never]: T[K];
+};
+
 type ExpectedRule = {
   value: any;
   property: string;
-  rule: keyof ValidationRules;
+  rule: keyof PickMatching<ValidationRules, Function>;
   messageError: SimpleValidationError;
   params?: any[];
 };
@@ -17,8 +21,10 @@ function expectIsValid({
   params = [],
 }: ExpectedRule) {
   const validator = ValidationRules.values(value, property);
-  //@ts-ignore
-  expect(() => validator[rule](...params)).not.toThrow(messageError);
+  expect(() => {
+    const method = validator[rule] as any;
+    method(...params);
+  }).not.toThrow(messageError);
 }
 
 function expectIsInvalid({
@@ -45,7 +51,7 @@ describe("ValidatorRules Unit Tests", () => {
   test("required validation rule", () => {
     const messageError = new SimpleValidationError("The field is required");
 
-    let data = [
+    let data: ExpectedRule[] = [
       { value: "test", property: "field", rule: "required", messageError },
       { value: 5, property: "field", rule: "required", messageError },
       { value: 0, property: "field", rule: "required", messageError },
@@ -167,7 +173,9 @@ describe("ValidatorRules Unit Tests", () => {
 
     validator = ValidationRules.values("t".repeat(11), "field");
     expect(() => validator.required().string().maxLength(10)).toThrow(
-      new SimpleValidationError("The field must be less or equal than 10 characters")
+      new SimpleValidationError(
+        "The field must be less or equal than 10 characters"
+      )
     );
 
     validator = ValidationRules.values(null, "field");
@@ -177,7 +185,9 @@ describe("ValidatorRules Unit Tests", () => {
 
     validator = ValidationRules.values(null, "field");
     expect(() => validator.string().maxLength(10)).not.toThrow(
-      new SimpleValidationError("The field must be less or equal than 10 characters")
+      new SimpleValidationError(
+        "The field must be less or equal than 10 characters"
+      )
     );
 
     validator = ValidationRules.values(null, "field");

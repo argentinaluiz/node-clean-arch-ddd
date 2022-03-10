@@ -1,6 +1,6 @@
-import UniqueEntityId from "./../unique-entity-id";
+import UniqueEntityId from "../unique-entity-id";
 import { validate as uuidValidate } from "uuid";
-import InvalidArgumentError from "../../errors/invalid-argument.error";
+import InvalidUuidError from "../../errors/invalid-uuid.error";
 
 function mockValidateMethod() {
   return jest.spyOn(UniqueEntityId.prototype as any, "validate");
@@ -10,12 +10,12 @@ describe("UniqueEntityId Unit Tests", () => {
   it("should throw error when uuid is invalid", () => {
     const validateMethodMock = mockValidateMethod();
     expect(() => new UniqueEntityId("fake id")).toThrow(
-      new InvalidArgumentError("ID must be a valid UUID")
+      new InvalidUuidError()
     );
     expect(validateMethodMock).toHaveBeenCalled();
   });
 
-  it("should accept a uuid passed in contructor", () => {
+  it("should accept a uuid passed in constructor", () => {
     const validateMethodMock = mockValidateMethod();
     const uuid = "5490020a-e866-4229-9adc-aa44b83234c4";
     const id = new UniqueEntityId(uuid);

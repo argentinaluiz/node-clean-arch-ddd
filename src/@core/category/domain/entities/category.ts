@@ -1,5 +1,5 @@
-import AggregateRoot from "../../../@seedwork/domain/entity/aggregate-root";
-import UniqueEntityId from "../../../@seedwork/domain/entity/unique-entity-id";
+import entity from "../../../@seedwork/domain/entity/aggregate-root";
+import UniqueEntityId from "../../../@seedwork/domain/value-objects/unique-entity-id";
 import CategoryValidatorFactory from "../validators/category.validator";
 import ValidatorRules from "../../../@seedwork/domain/validators/validator-rules";
 
@@ -9,8 +9,7 @@ export type CategoryProperties = {
   is_active?: boolean;
   created_at?: Date;
 };
-
-export default class Category extends AggregateRoot<CategoryProperties> {
+export class Category extends entity<CategoryProperties> {
   constructor(readonly props: CategoryProperties, id?: UniqueEntityId) {
     super(props, id);
     this.description = this.props.description;
@@ -37,7 +36,7 @@ export default class Category extends AggregateRoot<CategoryProperties> {
   }
 
   validate() {
-    CategoryValidatorFactory.create().validate(this.props);
+    CategoryValidatorFactory.create().validate({ id: this._id, ...this.props });
   }
 
   activate(): true {
@@ -66,3 +65,5 @@ export default class Category extends AggregateRoot<CategoryProperties> {
     return this.props.is_active;
   }
 }
+
+export default Category;
