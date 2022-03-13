@@ -135,6 +135,7 @@ export interface RepositoryInterface<E extends Entity> {
   findAll(): Promise<E[]>;
   update(entity: E): Promise<void>;
   delete(id: string | UniqueEntityId): Promise<void>;
+  validateEntity(entity: E): void;
 }
 
 export interface SearchableRepositoryInterface<

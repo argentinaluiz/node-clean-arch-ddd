@@ -1,7 +1,14 @@
-import domainValidators from '../../../@seedwork/domain/value-objects/unique-entity-id';
 import { CategoryProperties } from "../entities/category";
-import ClassValidator from "../../../@seedwork/domain/validators/class.validator";
-import { IsBoolean, IsInstance, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
+import ClassValidatorFields from "../../../@seedwork/domain/validators/class.validator";
+import {
+  IsBoolean,
+  IsInstance,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from "class-validator";
+import UniqueEntityId from "../../../@seedwork/domain/value-objects/unique-entity-id";
 
 export class CategoryValidatorFactory {
   static create() {
@@ -9,12 +16,12 @@ export class CategoryValidatorFactory {
   }
 }
 
-export default CategoryValidatorFactory
+export default CategoryValidatorFactory;
 
 export class CategoryRules {
-  @IsInstance(domainValidators)
+  @IsInstance(UniqueEntityId)
   @IsNotEmpty()
-  id: domainValidators
+  id: UniqueEntityId;
 
   @MaxLength(255)
   @IsString()
@@ -27,16 +34,23 @@ export class CategoryRules {
 
   @IsBoolean()
   @IsOptional()
-  is_active: boolean
+  is_active: boolean;
 
-  constructor(data: CategoryProperties & {id: domainValidators}) {
+  constructor(data: CategoryProperties & { id: UniqueEntityId }) {
     Object.assign(this, data);
   }
 }
 
-export class CategoryValidator extends ClassValidator {
-  validate(data: CategoryProperties & {id: domainValidators}): void {
-    const rules = new CategoryRules(data);
-    super._validate(rules);
+export class CategoryValidator extends ClassValidatorFields {
+  validate(data: CategoryProperties & { id: UniqueEntityId }): boolean {
+    return super._validate(this.makeRules(data));
+  }
+
+  // isValid(data: CategoryProperties & { id: UniqueEntityId }): boolean {
+  //   return super._isValid(this.makeRules(data));
+  // }
+
+  private makeRules(data: any) {
+    return new CategoryRules(data);
   }
 }

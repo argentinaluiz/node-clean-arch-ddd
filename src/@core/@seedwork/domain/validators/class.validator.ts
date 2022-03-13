@@ -1,15 +1,30 @@
-import ValidatorInterface, {
-  ValidationErrorFields,
-} from "./validator-interface";
+import ValidatorFieldsInterface, {
+  FieldsErrors,
+} from "./validator-fields-interface";
 import { validateSync } from "class-validator";
-import ValidationError from "../errors/validation.error";
+//import ValidationError from "../errors/validation.error";
 
 export type Rules = new (...args: any[]) => any;
 
-export default abstract class ClassValidator implements ValidatorInterface {
-  protected _errors: ValidationErrorFields = null;
+export default abstract class ClassValidatorFields
+  implements ValidatorFieldsInterface
+{
+  protected _errors: FieldsErrors = null;
 
-  protected _validate(data: object) {
+  // protected _isValid(data: any): boolean {
+  //   const errors = validateSync(data, {});
+
+  //   if (errors.length > 0) {
+  //     this._errors = {};
+  //     for (const error of errors) {
+  //       const field = error.property;
+  //       this._errors[field] = Object.values(error.constraints);
+  //     }
+  //   }
+  //   return !this.errors;
+  // }
+
+  protected _validate(data: any) {
     const errors = validateSync(data, {});
 
     if (errors.length > 0) {
@@ -18,13 +33,14 @@ export default abstract class ClassValidator implements ValidatorInterface {
         const field = error.property;
         this._errors[field] = Object.values(error.constraints);
       }
-      throw new ValidationError(this._errors);
     }
+    return !this.errors;
   }
 
-  get errors(): ValidationErrorFields {
+  get errors(): FieldsErrors {
     return this._errors;
   }
 
-  abstract validate(data: any): void;
+  abstract validate(data: any): boolean;
+
 }

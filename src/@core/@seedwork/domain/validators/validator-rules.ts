@@ -1,5 +1,6 @@
 import { SimpleValidationError } from "../errors/validation.error";
 
+//GuardClause
 export default class ValidatorRules {
   private constructor(private value: any, private property: string) {}
 

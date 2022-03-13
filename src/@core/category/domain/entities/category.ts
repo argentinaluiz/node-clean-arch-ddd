@@ -1,4 +1,4 @@
-import entity from "../../../@seedwork/domain/entity/aggregate-root";
+import AggregateRoot from "../../../@seedwork/domain/entity/aggregate-root";
 import UniqueEntityId from "../../../@seedwork/domain/value-objects/unique-entity-id";
 import CategoryValidatorFactory from "../validators/category.validator";
 import ValidatorRules from "../../../@seedwork/domain/validators/validator-rules";
@@ -9,8 +9,9 @@ export type CategoryProperties = {
   is_active?: boolean;
   created_at?: Date;
 };
-export class Category extends entity<CategoryProperties> {
-  constructor(readonly props: CategoryProperties, id?: UniqueEntityId) {
+export class Category extends AggregateRoot<CategoryProperties> {
+
+  constructor(props: CategoryProperties, id?: UniqueEntityId) {
     super(props, id);
     this.description = this.props.description;
     this.props.is_active = props.is_active ?? this.activate();
@@ -35,8 +36,33 @@ export class Category extends entity<CategoryProperties> {
       .boolean();
   }
 
-  validate() {
-    CategoryValidatorFactory.create().validate({ id: this._id, ...this.props });
+  //validate() {
+    // CategoryValidatorFactory.create().validate({
+    //   id: this.uniqueEntityId,
+    //   ...this.props,
+    // });
+  //}
+
+  protected validate() {
+    this.error.clear();
+
+    if (this.uniqueEntityId instanceof UniqueEntityId && !this.uniqueEntityId.is_valid) {
+      this.error.add({ id: this.uniqueEntityId.error.errors as string[] });
+    }
+
+    const categoryValidator = CategoryValidatorFactory.create();
+    const isValid = categoryValidator.validate({
+      id: this.uniqueEntityId,
+      ...this.props
+    });
+
+    if (!isValid) {
+      for (const field of Object.keys(categoryValidator.errors)) {
+        this.error.add({ [field]: categoryValidator.errors[field] });
+      }
+    }
+
+    return this.error.hasError();
   }
 
   activate(): true {

@@ -1,4 +1,4 @@
-import ClassValidator from "../class.validator";
+import ClassValidatorFields from "../class.validator";
 import ValidationError from "../../errors/validation.error";
 import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
 
@@ -17,17 +17,18 @@ class StubRules {
   }
 }
 
-class StubClassValidator extends ClassValidator {
-  validate(data: any): void {
-    super._validate(new StubRules(data));
+class StubClassValidator extends ClassValidatorFields {
+  validate(data: any): boolean {
+    return super._validate(new StubRules(data));
   }
 }
 
 describe("ClassValidator Integration Tests", () => {
   it("should throws validation errors", () => {
     const validator = new StubClassValidator();
-    expect(() => validator.validate(null)).toThrow(ValidationError);
-    expect(validator.errors).toMatchObject({
+    //expect(() => validator.validate(null)).toThrow(ValidationError);
+    expect(validator.validate(null)).toBeFalsy();
+    expect(validator.errors).toStrictEqual({
       name: [
         "name should not be empty",
         "name must be a string",
@@ -39,4 +40,10 @@ describe("ClassValidator Integration Tests", () => {
       ],
     });
   });
+
+  it('should be valid', () => {
+    const validator = new StubClassValidator();
+    expect(validator.validate({name: 'name test', money: 5})).toBeTruthy();
+    expect(validator.errors).toBeNull();
+  })
 });

@@ -3,15 +3,29 @@ import { CategoryOutputDto } from "./dto/category.dto";
 import Category from "../../domain/entities/category";
 import UseCase from '../../../@seedwork/application/use-case';
 import BadEntityOperationError from '../../../@seedwork/application/errors/bad-entity-operation.error';
-export class CreateCategoryUseCase implements UseCase<Input, Output> {
+
+export class UpdateCategoryUseCase implements UseCase<Input, Output> {
   constructor(private categoryRepository: CategoryRepository) {}
 
   async execute(input: Input): Promise<Output> {
-    const entity = Input.toEntity(input);
+
+    const entity = await this.categoryRepository.findById(input.id);
+    
+    entity.update(input.name, input.description);
+    
+    if(input.is_active === true){
+      entity.activate()
+    }
+
+    if(input.is_active === false){
+      entity.deactivate();
+    }
+
     if(!entity.is_valid){
       throw new BadEntityOperationError(entity.error);
     }
-    await this.categoryRepository.insert(entity);
+
+    await this.categoryRepository.update(entity);
     return this.toOutput(entity);
   }
 
@@ -20,16 +34,13 @@ export class CreateCategoryUseCase implements UseCase<Input, Output> {
   }
 }
 
-export default CreateCategoryUseCase;
+export default UpdateCategoryUseCase;
 
 export class Input {
+  id: string;
   name: string;
   description?: string;
   is_active?: boolean;
-
-  static toEntity(input: Input) {
-    return new Category(input);
-  }
 }
 
 export class Output extends CategoryOutputDto {

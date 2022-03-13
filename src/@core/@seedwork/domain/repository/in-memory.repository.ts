@@ -1,6 +1,8 @@
 import Entity from "../entity/entity";
 import UniqueEntityId from "../value-objects/unique-entity-id";
 import NotFoundError from "../errors/not-found.error";
+import LoadEntityError from "../errors/load-entity.error";
+
 import {
   RepositoryInterface,
   SearchableRepositoryInterface,
@@ -24,7 +26,10 @@ export default abstract class InMemoryRepository<E extends Entity>
   }
 
   async findAll(): Promise<E[]> {
-    return this.items;
+    return this.items.map((i) => {
+      this.validateEntity(i);
+      return i;
+    });
   }
 
   async update(entity: E): Promise<void> {
@@ -45,7 +50,14 @@ export default abstract class InMemoryRepository<E extends Entity>
     if (!item) {
       throw new NotFoundError(`Entity Not Found using ID '${id}'`);
     }
+    this.validateEntity(item);
     return item;
+  }
+
+  validateEntity(entity: E) {
+    if (!entity.is_valid) {
+      throw new LoadEntityError(entity.error);
+    }
   }
 }
 
@@ -62,11 +74,14 @@ export abstract class InMemorySearchableRepository<E extends Entity>
       input.sort,
       input.sort_dir
     );
-    let itemsPaginated = await this.applyPaginate(
+    let itemsPaginated = (await this.applyPaginate(
       itemsSorted,
       input.page,
       input.per_page
-    );
+    )).map((i) => {
+      this.validateEntity(i);
+      return i;
+    });
 
     return new SearchResult({
       items: itemsPaginated,
@@ -75,14 +90,11 @@ export abstract class InMemorySearchableRepository<E extends Entity>
       per_page: input.per_page,
       sort: input.sort,
       sort_dir: input.sort_dir,
-      filter: input.filter
+      filter: input.filter,
     });
   }
 
-  protected abstract applyFilter(
-    items: E[],
-    filter?: string
-  ): Promise<E[]>;
+  protected abstract applyFilter(items: E[], filter?: string): Promise<E[]>;
 
   protected async applySort(
     items: E[],
@@ -92,7 +104,7 @@ export abstract class InMemorySearchableRepository<E extends Entity>
     if (sort && this.sortableFields.includes(sort)) {
       return [...items].sort((a, b) => {
         const field = sort as keyof E;
-        
+
         if (a.props[field] < b.props[field]) {
           return sort_dir === "asc" ? -1 : 1;
         }

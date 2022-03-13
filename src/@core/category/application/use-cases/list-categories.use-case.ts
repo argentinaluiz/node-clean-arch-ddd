@@ -5,8 +5,9 @@ import CategoryRepository, {
 } from "../../domain/repositories/category.repository";
 import { PaginationOutputDto } from "../../../@seedwork/application/dto/pagination-output.dto";
 import { CategoryOutputDto } from "./dto/category.dto";
+import UseCase from '../../../@seedwork/application/use-case';
 
-export class ListCategoriesUseCase {
+export class ListCategoriesUseCase implements UseCase<Input, Output> {
   constructor(private categoryRepository: CategoryRepository) {}
 
   async execute(input: Input = null): Promise<Output> {

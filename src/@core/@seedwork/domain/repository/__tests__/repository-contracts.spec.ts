@@ -154,7 +154,11 @@ describe("SearchParams Unit Tests", () => {
   });
 });
 
-class StubEntity extends Entity {}
+class StubEntity extends Entity {
+  protected validate(){
+    return true;
+  }
+}
 
 describe("SearchResult Unit Tests", () => {
   test("constructor params", () => {

@@ -1,19 +1,28 @@
+import ErrorBag from "../errors/error-bag";
 import UniqueEntityId from "../value-objects/unique-entity-id";
 
 export default abstract class Entity<Props = any> {
-  protected readonly _id: UniqueEntityId;
+  readonly uniqueEntityId: UniqueEntityId;
+  readonly error = new ErrorBag;
 
   constructor(public readonly props: Props, id?: UniqueEntityId) {
-    this._id = id || new UniqueEntityId();
+    this.uniqueEntityId = id || new UniqueEntityId();
+  }
+
+  protected abstract validate(): boolean;
+
+  get is_valid(): boolean{
+    return this.error.notHasError();
   }
 
   get id(): string {
-    return this._id.value;
+    return this.uniqueEntityId.value;
   }
+
 
   toJSON(): Required<{ id: string } & Props> {
     return {
-      id: this._id.value,
+      id: this.uniqueEntityId.value,
       ...this.props,
     } as Required<{id: string} & Props>;
   }
