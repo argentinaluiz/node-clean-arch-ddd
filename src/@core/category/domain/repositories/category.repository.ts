@@ -6,6 +6,7 @@ import {
 } from "../../../@seedwork/domain/repository/repository-contracts";
 import Category from "../entities/category";
 
+//trabalhar com namespaces
 export type CategorySearchFilter = string;
 
 export interface SearchProps extends DefaultSearchProps<CategorySearchFilter> {}

@@ -1,4 +1,4 @@
-import { SimpleValidationError } from "../errors/validation.error";
+import { SimpleValidationError } from "../errors/entity-validation.error";
 
 //GuardClause
 export default class ValidatorRules {

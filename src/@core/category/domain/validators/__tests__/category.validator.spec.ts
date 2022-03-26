@@ -11,22 +11,16 @@ describe("Category validators tests", () => {
     });
 
     test("invalidation cases for id field", () => {
-      expect({ validator, data: null }).containErrorMessages({
-        id: [
-          "id should not be empty",
-          "id must be an instance of UniqueEntityId",
-        ],
-      });
+      expect(() => validator.validate({ id: "" } as any)).toThrow(
+        new Error(
+          "Value object must be returns an Error instance when is invalid. It returns undefined type"
+        )
+      );
 
-      expect({ validator, data: { id: "" } }).containErrorMessages({
+      expect({ validator, data: {id: UniqueEntityId.create('fake id')} }).containErrorMessages({
         id: [
-          "id should not be empty",
-          "id must be an instance of UniqueEntityId",
+          "ID must be a valid UUID",
         ],
-      });
-
-      expect({ validator, data: { id: 5 } }).containErrorMessages({
-        id: ["id must be an instance of UniqueEntityId"],
       });
     });
 
@@ -80,24 +74,33 @@ describe("Category validators tests", () => {
 
     test("validate cases for fields", () => {
       expect.assertions(0);
-      validator.validate({ id: new UniqueEntityId(), name: "test" });
+      //verificar o resultado do validate quando mudar para a nova forma
+      //verificar o ID
       validator.validate({
-        id: new UniqueEntityId(),
+        //id: new UniqueEntityId(),
+        name: "test",
+      });
+      validator.validate({
+        id: UniqueEntityId.create(),
+        name: "test",
+      });
+      validator.validate({
+        //id: new UniqueEntityId(),
         name: "test",
         description: undefined,
       });
       validator.validate({
-        id: new UniqueEntityId(),
+        //id: new UniqueEntityId(),
         name: "test",
         description: null,
       });
       validator.validate({
-        id: new UniqueEntityId(),
+        //id: new UniqueEntityId(),
         name: "test",
         is_active: true,
       });
       validator.validate({
-        id: new UniqueEntityId(),
+        //id: new UniqueEntityId(),
         name: "test",
         is_active: false,
       });

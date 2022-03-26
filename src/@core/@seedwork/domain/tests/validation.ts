@@ -1,5 +1,7 @@
+//import { Expected } from "../../@types/jest";
 import { objectContaining } from "expect";
 import Entity from "../entity/entity";
+import EntityValidationError from "../errors/entity-validation.error";
 //import ValidationError from "../errors/validation.error";
 import ClassValidatorFields from "../validators/class.validator";
 
@@ -10,18 +12,30 @@ import ClassValidatorFields from "../validators/class.validator";
 //     }
 //   }
 // }
-
-type Expected = { validator: ClassValidatorFields; data: any } | Entity;
-
+//type Expected = { validator: ClassValidatorFields; data: any } | ValidationError;
 //type Expected = any;
+
+type Expected =
+  | { validator: ClassValidatorFields; data: any }
+  | EntityValidationError;
+
+// declare global {
+//   namespace jest {
+//     // noinspection JSUnusedGlobalSymbols
+//     interface Matchers<R> {
+//       containErrorMessages: (expected: { [field: string]: string[] }) => R;
+//     }
+//   }
+// }
+
 expect.extend({
   containErrorMessages(
     expected: Expected,
     received: { [field: string]: string[] }
   ) {
     const isValid =
-      expected instanceof Entity
-        ? expected.is_valid
+      expected instanceof EntityValidationError
+        ? false
         : expected.validator.validate(expected.data);
 
     if (isValid) {
@@ -31,13 +45,8 @@ expect.extend({
       };
     }
     const errors =
-      expected instanceof Entity
-        ? expected.error.errors.reduce<{ [key: string]: string[] }>(
-            (prevValue, current) => {
-              return {...prevValue, ...current as object}
-            },
-            {}
-          )
+      expected instanceof EntityValidationError
+        ? expected.error
         : expected.validator.errors;
     const isMatch = objectContaining(received).asymmetricMatch(errors);
     return isMatch

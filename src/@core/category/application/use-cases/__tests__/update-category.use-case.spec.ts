@@ -12,9 +12,9 @@ describe("UpdateCategoryUseCase Unit Tests", () => {
   });
 
   it("should update a category", async () => {
-    const items = [new Category({ name: "test 1" })];
+    const items = [Category.create({ name: "test 1" })[0]];
     repository.items = items;
-    let output = await useCase.execute({
+    let [output, error] = await useCase.execute({
       id: items[0].id,
       name: "test changed",
     });
@@ -26,7 +26,7 @@ describe("UpdateCategoryUseCase Unit Tests", () => {
       created_at: repository.items[0].props.created_at,
     });
 
-    output = await useCase.execute({
+    [output] = await useCase.execute({
       id: items[0].id,
       name: "test changed",
       description: "description changed",
@@ -40,7 +40,7 @@ describe("UpdateCategoryUseCase Unit Tests", () => {
       created_at: repository.items[0].props.created_at,
     });
 
-    output = await useCase.execute({
+    [output] = await useCase.execute({
       id: items[0].id,
       name: "test changed",
       description: "description changed",
@@ -55,7 +55,7 @@ describe("UpdateCategoryUseCase Unit Tests", () => {
       created_at: repository.items[0].props.created_at,
     });
 
-    output = await useCase.execute({
+    [output] = await useCase.execute({
       id: items[0].id,
       name: "test changed",
       description: "description changed",

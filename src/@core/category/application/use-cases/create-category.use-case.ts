@@ -1,37 +1,59 @@
+import { Either } from "../../../@seedwork/domain/utils/either";
 import CategoryRepository from "../../domain/repositories/category.repository";
-import { CategoryOutputDto } from "./dto/category.dto";
+import {
+  CategoryOutput,
+  CategoryOutputMapper,
+} from "./dto/category-output.dto";
 import Category from "../../domain/entities/category";
-import UseCase from '../../../@seedwork/application/use-case';
-import BadEntityOperationError from '../../../@seedwork/application/errors/bad-entity-operation.error';
-export class CreateCategoryUseCase implements UseCase<Input, Output> {
+import UseCase from "../../../@seedwork/application/use-case";
+import EntityValidationError from "../../../@seedwork/domain/errors/entity-validation.error";
+import GenericError from "../../../@seedwork/domain/errors/generic.error";
+
+export class CreateCategoryUseCase implements UseCase<Input, EitherOutput> {
   constructor(private categoryRepository: CategoryRepository) {}
 
-  async execute(input: Input): Promise<Output> {
-    const entity = Input.toEntity(input);
-    if(!entity.is_valid){
-      throw new BadEntityOperationError(entity.error);
+  async execute(input: Input): Promise<EitherOutput> {
+    const [entity, error] = InputMapper.toEntity(input);
+    if (error) {
+      return Either.fail(error);
     }
-    await this.categoryRepository.insert(entity);
-    return this.toOutput(entity);
+
+    try {
+      await this.categoryRepository.insert(entity);
+      return this.toEitherOutput(entity);
+    } catch (e) {
+      return Either.fail(new GenericError(e as Error));
+    }
   }
 
-  toOutput(entity: Category): Output {
-    return Output.fromEntity(entity);
+  toEitherOutput(entity: Category): EitherOutput {
+    return Either.ok(OutputMapper.from(entity));
   }
 }
 
 export default CreateCategoryUseCase;
 
-export class Input {
+export type Input = {
   name: string;
   description?: string;
   is_active?: boolean;
+};
 
-  static toEntity(input: Input) {
-    return new Category(input);
+export class InputMapper {
+  static toEntity(
+    input: Input
+  ): Either.Either<Category, EntityValidationError> {
+    return Category.create(input);
   }
 }
 
-export class Output extends CategoryOutputDto {
-  
+export type EitherOutput = Either.Either<
+  CategoryOutput,
+  EntityValidationError | GenericError
+>;
+
+export class OutputMapper {
+  static from(entity: Category) {
+    return CategoryOutputMapper.fromEntity(entity);
+  }
 }

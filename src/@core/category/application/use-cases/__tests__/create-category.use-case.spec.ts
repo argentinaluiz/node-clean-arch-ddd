@@ -1,8 +1,8 @@
 import Category from "../../../domain/entities/category";
 import CategoryInMemoryRepository from "../../../infra/repositories/category-in-memory.repository";
 import CreateCategoryUseCase, {
-  Input,
-  Output,
+  InputMapper,
+  OutputMapper,
 } from "../create-category.use-case";
 
 describe("CreateCategoryUseCase Unit Tests", () => {
@@ -15,14 +15,14 @@ describe("CreateCategoryUseCase Unit Tests", () => {
   });
 
   it("should convert input to entity", () => {
-    let entity = Input.toEntity({ name: "test" });
+    let [entity] = InputMapper.toEntity({ name: "test" });
     expect(entity.toJSON()).toMatchObject({
       name: "test",
       description: null,
       is_active: true,
     });
 
-    entity = Input.toEntity({
+    [entity] = InputMapper.toEntity({
       name: "test",
       description: "description test",
       is_active: false,
@@ -35,8 +35,8 @@ describe("CreateCategoryUseCase Unit Tests", () => {
   });
 
   it("should convert entity to output", () => {
-    let entity = new Category({ name: "test" });
-    let output = Output.fromEntity(entity);
+    let [entity] = Category.create({ name: "test" });
+    let output = OutputMapper.from(entity);
     expect(output).toStrictEqual({
       id: entity.id,
       name: "test",
@@ -45,12 +45,12 @@ describe("CreateCategoryUseCase Unit Tests", () => {
       created_at: entity.props.created_at,
     });
 
-    entity = new Category({
+    [entity] = Category.create({
       name: "test",
       description: "description test",
       is_active: false,
     });
-    output = Output.fromEntity(entity);
+    output = OutputMapper.from(entity);
     expect(output).toStrictEqual({
       id: entity.id,
       name: "test",
@@ -61,7 +61,7 @@ describe("CreateCategoryUseCase Unit Tests", () => {
   });
 
   it("should create a category", async () => {
-    let output = await useCase.execute({ name: "test" });
+    let [output] = await useCase.execute({ name: "test" });
     expect(output).toStrictEqual({
       id: repository.items[0].id,
       name: "test",
@@ -70,7 +70,7 @@ describe("CreateCategoryUseCase Unit Tests", () => {
       created_at: repository.items[0].props.created_at,
     });
 
-    output = await useCase.execute({
+    [output] = await useCase.execute({
       name: "test",
       description: "test description",
       is_active: false,

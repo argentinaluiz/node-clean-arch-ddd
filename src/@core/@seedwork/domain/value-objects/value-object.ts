@@ -6,17 +6,10 @@ export default abstract class ValueObject<Value = any> {
 
   constructor(value: Value) {
     this._value = deepFreeze<Value>(value);
-    this.validate();
   }
 
   get value(): Value {
     return this._value;
-  }
-
-  protected abstract validate(): boolean;
-
-  get is_valid(): boolean{
-    return this.error.notHasError();
   }
 
   public toString = (): string => {

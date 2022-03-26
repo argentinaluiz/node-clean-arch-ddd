@@ -3,24 +3,34 @@ import { validate as uuidValidate } from "uuid";
 //import InvalidUuidError from "../../errors/invalid-uuid.error";
 
 function mockValidateMethod() {
-  return jest.spyOn(UniqueEntityId.prototype as any, "validate");
+  return jest.spyOn(UniqueEntityId as any, "validate");
 }
 
 describe("UniqueEntityId Unit Tests", () => {
 
+  test("validate method", () => {
+    let isValid = UniqueEntityId['validate']("fake id");
+    expect(isValid).toBeFalsy();
+
+    isValid = UniqueEntityId['validate']("5490020a-e866-4229-9adc-aa44b83234c4");
+    expect(isValid).toBeTruthy();
+  });
+
   it("should accept a uuid passed in constructor", () => {
-    const isValidMethodMock = mockValidateMethod();
+    const isValidateMethodMock = mockValidateMethod();
     const uuid = "5490020a-e866-4229-9adc-aa44b83234c4";
-    const id = new UniqueEntityId(uuid);
+    const [id, error] = UniqueEntityId.create(uuid);
     expect(id.value).toBe(uuid);
-    expect(isValidMethodMock).toHaveBeenCalled();
+    expect(error).toBeNull();
+    expect(isValidateMethodMock).toHaveBeenCalled();
   });
 
   it("should define a id when pass id not defined in constructor", () => {
     const validateMethodMock = mockValidateMethod();
-    const id = new UniqueEntityId();
+    const [id, error] = UniqueEntityId.create();
     expect(uuidValidate(id.value)).toBeTruthy();
-    expect(validateMethodMock).toHaveBeenCalled();
+    expect(error).toBeNull();
+    expect(validateMethodMock).not.toHaveBeenCalled();
   });
 
   // it("should throw error when uuid is invalid", () => {
@@ -30,22 +40,4 @@ describe("UniqueEntityId Unit Tests", () => {
   //   );
   //   expect(validateMethodMock).toHaveBeenCalled();
   // });
-
-  test("isValid method", () => {
-    let vo = new UniqueEntityId();
-    expect(vo['validate']()).toBeTruthy();
-
-    vo = new UniqueEntityId("5490020a-e866-4229-9adc-aa44b83234c4");
-    expect(vo['validate']()).toBeTruthy();
-
-    vo = new UniqueEntityId("fake id");
-    const spyHasError = jest.spyOn(vo.error, 'hasError');
-    expect(vo['validate']()).toBeFalsy();
-    expect(vo.error.errors).toStrictEqual(['ID must be a valid UUID']);
-    expect(spyHasError).toBeCalled();
-    expect(spyHasError.mock.results[0].value).toBeTruthy();
-
-    vo['validate']();
-    expect(spyHasError.mock.results[1].value).toBeTruthy();
-  });
 });

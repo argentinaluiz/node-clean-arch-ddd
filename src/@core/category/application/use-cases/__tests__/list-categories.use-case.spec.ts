@@ -50,7 +50,7 @@ describe("ListCategories Unit Tests", () => {
   });
 
   test("toOutput method", () => {
-    let entity = new Category({ name: "test" });
+    let [entity] = Category.create({ name: "test" });
     let searchResult = new SearchResult({
       items: [entity],
       total: 1,
@@ -59,7 +59,7 @@ describe("ListCategories Unit Tests", () => {
       sort: "name",
       sort_dir: "asc",
     });
-    let output = useCase["toOutput"](searchResult);
+    let [output] = useCase["toOutput"](searchResult);
 
     expect(output).toStrictEqual({
       items: [entity.toJSON()],
@@ -72,12 +72,12 @@ describe("ListCategories Unit Tests", () => {
 
   it("should returns the output with all categories when input is empty", async () => {
     const items = [
-      new Category({ name: "test 1" }),
-      new Category({ name: "test 2", created_at: new Date(new Date().getTime() + 100) }),
+      Category.create({ name: "test 1" })[0],
+      Category.create({ name: "test 2", created_at: new Date(new Date().getTime() + 100) })[0],
     ];
     repository.items = items;
 
-    const output = await useCase.execute();
+    const [output] = await useCase.execute();
     expect(output).toStrictEqual({
       items: [...items].reverse().map((i) => i.toJSON()),
       total: 2,
@@ -89,15 +89,15 @@ describe("ListCategories Unit Tests", () => {
 
   it("should returns the output with using paginate, filter and sort", async () => {
     const items = [
-      new Category({ name: "a" }),
-      new Category({ name: "AAA" }),
-      new Category({ name: "AaA" }),
-      new Category({ name: "b" }),
-      new Category({ name: "c" }),
+      Category.create({ name: "a" })[0],
+      Category.create({ name: "AAA" })[0],
+      Category.create({ name: "AaA" })[0],
+      Category.create({ name: "b" })[0],
+      Category.create({ name: "c" })[0],
     ];
     repository.items = items;
 
-    let output = await useCase.execute({page: 1, per_page: 2, sort: 'name', filter: 'a'});
+    let [output] = await useCase.execute({page: 1, per_page: 2, sort: 'name', filter: 'a'});
     expect(output).toStrictEqual({
       items: [items[1].toJSON(), items[2].toJSON()],
       total: 3,
@@ -106,7 +106,7 @@ describe("ListCategories Unit Tests", () => {
       last_page: 2,
     });
 
-    output = await useCase.execute({page: 2, per_page: 2, sort: 'name', filter: 'a'});
+    [output] = await useCase.execute({page: 2, per_page: 2, sort: 'name', filter: 'a'});
     expect(output).toStrictEqual({
       items: [items[0].toJSON()],
       total: 3,
@@ -115,7 +115,7 @@ describe("ListCategories Unit Tests", () => {
       last_page: 2,
     });
 
-    output = await useCase.execute({page: 1, per_page: 2, sort: 'name', filter: 'a', sort_dir: 'desc'});
+    [output] = await useCase.execute({page: 1, per_page: 2, sort: 'name', filter: 'a', sort_dir: 'desc'});
     expect(output).toStrictEqual({
       items: [items[0].toJSON(), items[2].toJSON()],
       total: 3,

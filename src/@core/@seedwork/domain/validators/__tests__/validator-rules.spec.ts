@@ -1,4 +1,4 @@
-import { SimpleValidationError } from "../../errors/validation.error";
+import { SimpleValidationError } from "../../errors/entity-validation.error";
 import ValidationRules from "../validator-rules";
 
 type PickMatching<T, V> = {

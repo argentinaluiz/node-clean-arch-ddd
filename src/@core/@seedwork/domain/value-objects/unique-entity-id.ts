@@ -1,10 +1,11 @@
 import ValueObject from "./value-object";
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-//import InvalidUuidError from "../errors/invalid-uuid.error";
+import {Either} from "../utils/either";
+import InvalidUuidError from "../errors/invalid-uuid.error";
 
 export default class UniqueEntityId extends ValueObject<string> {
-  constructor(id?: string) {
-    super(id || uuidv4());
+  private constructor(id?: string) {
+    super(id ?? uuidv4());
   }
 
   // private validate() {
@@ -14,14 +15,17 @@ export default class UniqueEntityId extends ValueObject<string> {
   //   }
   // }
 
-  protected validate(): boolean {
-    if (this.error.hasError()) {
-      return false;
+  static create(id?: string): Either.Either<UniqueEntityId, InvalidUuidError> {
+    if(id){
+      const isValid = this.validate(id);
+      if(!isValid){
+        return Either.fail(new InvalidUuidError)
+      }
     }
-    const isValid = uuidValidate(this._value);
-    if (!isValid) {
-      this.error.add("ID must be a valid UUID");
-    }
-    return isValid;
+    return Either.ok(new UniqueEntityId(id));
+  }
+
+  protected static validate(value: string): boolean {
+    return uuidValidate(value);
   }
 }

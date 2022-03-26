@@ -1,4 +1,4 @@
-export type ErrorValue = string | { [key: string]: string[] };
+export type ErrorValue = string | Error | { [key: string]: string[] };
 
 export default class ErrorBag {
   private _errors: ErrorValue[] = [];

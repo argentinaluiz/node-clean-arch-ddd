@@ -59,7 +59,7 @@ export class SearchParams<Filter = string> {
   }
 
   private set sort(value: string) {
-    this._sort = !value ? null : `${value}`;
+    this._sort = value === null || value === undefined || value === "" ? null : `${value}`;
   }
 
   get sort_dir() {
@@ -67,12 +67,15 @@ export class SearchParams<Filter = string> {
   }
 
   private set sort_dir(value: SortDirection) {
+    if (!this.sort) {
+      this._sort_dir = null;
+      return;
+    }
+
     const dir = `${value}`.toLowerCase();
     this._sort_dir = dir !== "asc" && dir !== "desc" ? "asc" : dir;
 
-    if (!this.sort) {
-      this._sort_dir = null;
-    }
+    
   }
 
   get filter() {
@@ -80,7 +83,7 @@ export class SearchParams<Filter = string> {
   }
 
   private set filter(value: Filter) {
-    this._filter = !value ? null : (`${value}` as any);
+    this._filter = value === null || value === undefined || (value as unknown) === "" ? null : (`${value}` as any);
   }
 }
 
@@ -135,7 +138,6 @@ export interface RepositoryInterface<E extends Entity> {
   findAll(): Promise<E[]>;
   update(entity: E): Promise<void>;
   delete(id: string | UniqueEntityId): Promise<void>;
-  validateEntity(entity: E): void;
 }
 
 export interface SearchableRepositoryInterface<

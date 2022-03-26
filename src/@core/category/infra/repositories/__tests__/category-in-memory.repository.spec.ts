@@ -6,7 +6,9 @@ describe("CategoryInMemoryRepository", () => {
 
   beforeEach(() => (repository = new CategoryInMemoryRepository()));
   it("should no filter items when filter object is null", async () => {
-    const items = [new Category({ name: "test" })];
+    const items = [
+      Category.create({ name: "test" })[0] //gerar uma funcao para ficar mais facil
+    ];
     const filterSpy = jest.spyOn(items, "filter" as any);
 
     let itemsFiltered = await repository["applyFilter"](items);
@@ -16,9 +18,9 @@ describe("CategoryInMemoryRepository", () => {
 
   it("should filter items using filter parameter", async () => {
     const items = [
-      new Category({ name: "test" }),
-      new Category({ name: "TEST" }),
-      new Category({ name: "fake" }),
+      Category.create({ name: "test" })[0],
+      Category.create({ name: "TEST" })[0],
+      Category.create({ name: "fake" })[0],
     ];
     const filterSpy = jest.spyOn(items, "filter" as any);
 
@@ -30,15 +32,15 @@ describe("CategoryInMemoryRepository", () => {
   it("should sort by created_at when sort param is null", async () => {
     const created_at = new Date();
     const items = [
-      new Category({ name: "test", created_at: created_at }),
-      new Category({
+      Category.create({ name: "test", created_at: created_at })[0],
+      Category.create({
         name: "TEST",
         created_at: new Date(created_at.getTime() + 100),
-      }),
-      new Category({
+      })[0],
+      Category.create({
         name: "fake",
         created_at: new Date(created_at.getTime() + 200),
-      }),
+      })[0],
     ];
 
     let itemsSorted = await repository["applySort"](items);
@@ -47,9 +49,9 @@ describe("CategoryInMemoryRepository", () => {
 
   it("should sort by name", async () => {
     const items = [
-      new Category({ name: "c" }),
-      new Category({ name: "b" }),
-      new Category({ name: "a" }),
+      Category.create({ name: "c" })[0],
+      Category.create({ name: "b" })[0],
+      Category.create({ name: "a" })[0],
     ];
     
     let itemsSorted = await repository["applySort"](items, "name", "asc");

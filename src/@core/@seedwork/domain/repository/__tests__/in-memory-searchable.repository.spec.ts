@@ -48,6 +48,7 @@ describe("InMemorySearchableRepository Unit tests", () => {
     });
 
     it("should filter items using filter parameter", async () => {
+      //buscar por contains
       const items = [
         new StubEntity({ name: "test", price: 5 }),
         new StubEntity({ name: "TEST", price: 5 }),

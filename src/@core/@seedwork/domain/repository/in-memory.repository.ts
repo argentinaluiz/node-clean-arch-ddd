@@ -10,6 +10,8 @@ import {
   SearchResult,
   SortDirection,
 } from "./repository-contracts";
+import EntityValidationError from "../errors/entity-validation.error";
+import ErrorBag from "../errors/error-bag";
 
 export default abstract class InMemoryRepository<E extends Entity>
   implements RepositoryInterface<E>
@@ -27,7 +29,6 @@ export default abstract class InMemoryRepository<E extends Entity>
 
   async findAll(): Promise<E[]> {
     return this.items.map((i) => {
-      this.validateEntity(i);
       return i;
     });
   }
@@ -50,14 +51,7 @@ export default abstract class InMemoryRepository<E extends Entity>
     if (!item) {
       throw new NotFoundError(`Entity Not Found using ID '${id}'`);
     }
-    this.validateEntity(item);
     return item;
-  }
-
-  validateEntity(entity: E) {
-    if (!entity.is_valid) {
-      throw new LoadEntityError(entity.error);
-    }
   }
 }
 
@@ -74,12 +68,9 @@ export abstract class InMemorySearchableRepository<E extends Entity>
       input.sort,
       input.sort_dir
     );
-    let itemsPaginated = (await this.applyPaginate(
-      itemsSorted,
-      input.page,
-      input.per_page
-    )).map((i) => {
-      this.validateEntity(i);
+    let itemsPaginated = (
+      await this.applyPaginate(itemsSorted, input.page, input.per_page)
+    ).map((i) => {
       return i;
     });
 

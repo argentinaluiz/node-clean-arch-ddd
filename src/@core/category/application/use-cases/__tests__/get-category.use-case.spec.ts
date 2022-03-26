@@ -13,11 +13,11 @@ describe("GetCategory Unit Tests", () => {
 
   it("should returns the output with a category", async () => {
     const items = [
-      new Category({ name: "test 1" }),
+      Category.create({ name: "test 1" })[0],
     ];
     repository.items = items;
 
-    const output = await useCase.execute({id: items[0].id});
+    const [output] = await useCase.execute({id: items[0].id});
     expect(output).toStrictEqual(items[0].toJSON());
   });
 });

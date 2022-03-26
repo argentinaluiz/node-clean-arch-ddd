@@ -12,12 +12,14 @@ describe("DeleteCategoryUseCase Unit Tests", () => {
   });
 
   it("should update a category", async () => {
-    const items = [new Category({ name: "test 1" })];
+    const items = [
+      Category.create({ name: "test 1" })[0]
+    ];
     repository.items = items;
-    let output = await useCase.execute({
+    let [output] = await useCase.execute({
       id: items[0].id,
     });
-    expect(output).toBe(undefined);
+    expect(output).toBe(null);
     expect(repository.items).toHaveLength(0);
   });
 });

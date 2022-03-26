@@ -1,14 +1,17 @@
+import { Either } from './../../../@seedwork/domain/utils/either';
 import { CategoryProperties } from "../entities/category";
 import ClassValidatorFields from "../../../@seedwork/domain/validators/class.validator";
 import {
   IsBoolean,
-  IsInstance,
+  IsDate,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
 } from "class-validator";
 import UniqueEntityId from "../../../@seedwork/domain/value-objects/unique-entity-id";
+import ValueObjectValidate from "../../../@seedwork/infra/validators/value-object-validate";
+import { IsInstanceOf } from '@core/@seedwork/infra/validators/is-instace-of';
 
 export class CategoryValidatorFactory {
   static create() {
@@ -19,9 +22,13 @@ export class CategoryValidatorFactory {
 export default CategoryValidatorFactory;
 
 export class CategoryRules {
-  @IsInstance(UniqueEntityId)
-  @IsNotEmpty()
-  id: UniqueEntityId;
+  // @IsInstanceOf(UniqueEntityId)
+  // @IsNotEmpty()
+  // id: UniqueEntityId;
+
+  @ValueObjectValidate()
+  @IsOptional()
+  id?: UniqueEntityId | Either.Either<UniqueEntityId>; 
 
   @MaxLength(255)
   @IsString()
@@ -36,13 +43,21 @@ export class CategoryRules {
   @IsOptional()
   is_active: boolean;
 
-  constructor(data: CategoryProperties & { id: UniqueEntityId }) {
+  @IsDate()
+  @IsOptional()
+  created_at: Date
+
+  constructor(data: CategoryProperties & {id?: UniqueEntityId | Either.Either<UniqueEntityId>}) {
     Object.assign(this, data);
   }
 }
 
-export class CategoryValidator extends ClassValidatorFields {
-  validate(data: CategoryProperties & { id: UniqueEntityId }): boolean {
+export class CategoryValidator extends ClassValidatorFields<CategoryRules> {
+  // validate(data: CategoryProperties & { id: UniqueEntityId }): boolean {
+  //   return super._validate(this.makeRules(data));
+  // }
+
+  validate(data: CategoryProperties & {id?: UniqueEntityId | Either.Either<UniqueEntityId>}): boolean {
     return super._validate(this.makeRules(data));
   }
 

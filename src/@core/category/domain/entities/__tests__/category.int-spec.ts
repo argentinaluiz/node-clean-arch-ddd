@@ -1,58 +1,74 @@
-//import { SimpleValidationError } from "./../../@seedwork/errors/validation.error";
+import EntityValidationError from "../../../../@seedwork/domain/errors/entity-validation.error";
 import UniqueEntityId from "../../../../@seedwork/domain/value-objects/unique-entity-id";
 import Category, { CategoryProperties } from "../category";
+//import { SimpleValidationError } from "./../../@seedwork/errors/validation.error";
 
 describe("Category Integration Tests", () => {
-  
   it("should a valid entity", () => {
     const arrange: CategoryProperties[] = [
-      {name:'Movie'},
-      {name:'Movie', description: null},
-      {name:'Movie', is_active: true},
-      {name:'Movie', is_active: false},
-      {name:'Movie', description: 'description test', is_active: true},
-    ]
+      { name: "Movie" },
+      { name: "Movie", description: null },
+      { name: "Movie", is_active: true },
+      { name: "Movie", is_active: false },
+      { name: "Movie", description: "description test", is_active: true },
+    ];
 
-    arrange.forEach(i => {
-      const category = new Category(i);
-      expect(category.is_valid).toBeTruthy();
+    arrange.forEach((i) => {
+      const [category, error] = Category.create(i);
+      expect(error).toBeNull();
+      expect(category).toBeInstanceOf(Category);
     });
 
-    arrange.forEach(i => {
-      const category = new Category(i, new UniqueEntityId("5490020a-e866-4229-9adc-aa44b83234c4"));
-      expect(category.is_valid).toBeTruthy();
+    arrange.forEach((i) => {
+      const [category] = Category.create(i, "5490020a-e866-4229-9adc-aa44b83234c4");
+      expect(category).toBeInstanceOf(Category);
+    });
+  });
+
+  it("should a invalid entity using id field", () => {
+    const uniqueEntityIdOrError = UniqueEntityId.create('teste');
+    let [, error] = Category.validate({ name: 'Movie', id: uniqueEntityIdOrError});
+    expect(error).toBeInstanceOf(EntityValidationError);
+    expect(error).containErrorMessages({
+      id: [
+        "ID must be a valid UUID",
+      ],
     });
   });
 
   it("should a invalid entity using name field", () => {
-    expect(  new Category({ name: null })).containErrorMessages({
+    let [, error] = Category.validate({ name: null } as any);
+    expect(error).toBeInstanceOf(EntityValidationError);
+    expect(error).containErrorMessages({
       name: [
         "name should not be empty",
         "name must be a string",
         "name must be shorter than or equal to 255 characters",
       ],
     });
-    expect( new Category({ name: "" })).containErrorMessages({
+
+    [, error] = Category.validate({ name: "" });
+    expect(error).containErrorMessages({
       name: ["name should not be empty"],
     });
-    expect( new Category({ name: "t".repeat(256) })).containErrorMessages({
+
+    [, error] = Category.validate({ name: "t".repeat(256) });
+    expect(error).containErrorMessages({
       name: ["name must be shorter than or equal to 255 characters"],
     });
   });
 
   it("should a invalid entity using description field", () => {
-    expect(new Category({ name: null, description: 5 as any })).containErrorMessages({
-      description: [
-        "description must be a string",
-      ],
+    let [, error] = Category.validate({ name: null, description: 5 as any });
+    expect(error).containErrorMessages({
+      description: ["description must be a string"],
     });
   });
 
   it("should a invalid entity using is_active field", () => {
-    expect( new Category({ name: null, is_active: 5 as any })).containErrorMessages({
-      is_active: [
-        "is_active must be a boolean value",
-      ],
+    let [, error] = Category.validate({ name: null, is_active: 5 as any });
+    expect(error).containErrorMessages({
+      is_active: ["is_active must be a boolean value"],
     });
   });
 
@@ -108,9 +124,8 @@ describe("Category Integration Tests", () => {
   // });
 });
 
-
 // describe("Category Integration Tests", () => {
-  
+
 //   it("should a valid entity", () => {
 //     expect.assertions(0);
 

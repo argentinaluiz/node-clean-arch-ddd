@@ -1,16 +1,19 @@
+import { CategoryProperties } from "./../category";
 //import { SimpleValidationError } from "./../../@seedwork/errors/validation.error";
 import Category from "../category";
+import { Either } from "../../../../@seedwork/domain/utils/either";
+import EntityValidationError from "../../../../@seedwork/domain/errors/entity-validation.error";
 
 describe("Category Unit Tests", () => {
   beforeEach(() => {
-     Category.prototype['validate'] = jest.fn();
-  })
+    Category.validate = jest.fn().mockImplementation((data) => Either.ok(data));
+  });
 
   it("should create a category", () => {
-    const category1 = new Category({
+    const [category1] = Category.create({
       name: "Movie",
     });
-    expect(Category.prototype['validate']).toBeCalled();
+    expect(Category.validate).toBeCalled();
     expect(category1.props).toMatchObject({
       name: "Movie",
       description: null,
@@ -20,7 +23,7 @@ describe("Category Unit Tests", () => {
     expect(category1.props.created_at).toBeInstanceOf(Date);
 
     const date = new Date();
-    const category2 = new Category({
+    const [category2] = Category.create({
       name: "Movie",
       description: "some description",
       is_active: false,
@@ -33,45 +36,65 @@ describe("Category Unit Tests", () => {
       created_at: date,
     });
 
-    const category3 = new Category({
+    //Category.validate = jest.fn().mockReturnValue([props, null]);
+    const [category3] = Category.create({
       name: "Movie",
       is_active: true,
     });
     expect(category3.props.is_active).toBeTruthy();
   });
 
+  it("should returns an EntityValidationError on create when props are invalid", () => {
+    Category.validate = jest
+      .fn()
+      .mockImplementation((data) =>
+        Either.fail(
+          new EntityValidationError({ name: ["The field is required"] })
+        )
+      );
+    const [category, error] = Category.create({} as any);
+    expect(category).toBeNull();
+    expect(error).toBeInstanceOf(EntityValidationError);
+  });
+
   it("should active a category", () => {
-    const category = new Category({
-      name: "Filmes",
-      is_active: false,
-    });
+    let props: CategoryProperties = { name: "Filmes", is_active: false };
+    const [category] = Category.create(props);
     category.activate();
-    expect(Category.prototype['validate']).toBeCalled();
     expect(category.is_active).toBeTruthy();
   });
 
   test("should disable a category", () => {
-    const category = new Category({
-      name: "Filmes",
-      is_active: true,
-    });
+    let props: CategoryProperties = { name: "Filmes", is_active: true };
+    const [category] = Category.create(props);
     category.deactivate();
-    expect(Category.prototype['validate']).toBeCalled();
     expect(category.is_active).toBeFalsy();
   });
 
   test("should be updated props", () => {
-    const category = new Category({
-      name: "Movie",
-    });
-    category.update("Documentary", "some description");
-    expect(Category.prototype['validate']).toBeCalled();
+    const [category] = Category.create({ name: "Movie" });
+    const error = category.update("Documentary", "some description");
+    expect(error).toBeUndefined();
+    expect(Category.validate).toBeCalled();
     expect(category.name).toBe("Documentary");
     expect(category.description).toBe("some description");
   });
 
+  it("should returns an EntityValidationError on update when props are invalid", () => {
+    const [category] = Category.create({ name: "Movie" });
+    Category.validate = jest
+      .fn()
+      .mockImplementation((data) =>
+        Either.fail(
+          new EntityValidationError({ name: ["The field is required"] })
+        )
+      );
+    const error = category.update("");
+    expect(error).toBeInstanceOf(EntityValidationError);
+  });
+
   test("props getters", () => {
-    const category = new Category({
+    const [category] = Category.create({
       name: "Movie",
       description: "any description",
     });
@@ -81,7 +104,7 @@ describe("Category Unit Tests", () => {
   });
 
   test("description prop setter", () => {
-    const category = new Category({
+    const [category] = Category.create({
       name: "Movie",
     });
     category["description"] = undefined;
@@ -92,7 +115,6 @@ describe("Category Unit Tests", () => {
     expect(category.props.description).toBe(null);
   });
 });
-
 
 // describe("Category Unit Tests", () => {
 //   beforeEach(() => {

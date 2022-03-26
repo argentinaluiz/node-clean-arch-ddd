@@ -1,5 +1,5 @@
 import ClassValidatorFields from "../class.validator";
-import ValidationError from "../../errors/validation.error";
+import EntityValidationError from "../../errors/entity-validation.error";
 import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
 
 class StubRules {
@@ -17,7 +17,7 @@ class StubRules {
   }
 }
 
-class StubClassValidator extends ClassValidatorFields {
+class StubClassValidator extends ClassValidatorFields<StubRules> {
   validate(data: any): boolean {
     return super._validate(new StubRules(data));
   }
@@ -39,11 +39,13 @@ describe("ClassValidator Integration Tests", () => {
         "money must be a number conforming to the specified constraints",
       ],
     });
+    expect(validator.validatedData).toBeNull();
   });
 
   it('should be valid', () => {
     const validator = new StubClassValidator();
     expect(validator.validate({name: 'name test', money: 5})).toBeTruthy();
     expect(validator.errors).toBeNull();
+    expect(validator.validatedData).toStrictEqual(new StubRules({name: 'name test', money: 5}));
   })
 });
